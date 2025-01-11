@@ -59,6 +59,30 @@
   }
 }
 
+.nav-link {
+  position: relative;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: #434446; 
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px; 
+  width: 0;
+  height: 2px; 
+  background-color: #e01d47; 
+  transition: width 0.3s ease-in-out;
+}
+
+.nav-link:hover::after {
+  width: 100%; 
+}
+
+
 @layer base {
   * {
     @apply border-border;

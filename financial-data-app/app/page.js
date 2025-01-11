@@ -16,11 +16,32 @@ import {
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell} from "@/components/ui/table"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogBody, DialogFooter } from "@/components/ui/dialog"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input"
-import { Landmark, Filter, ListOrdered, ChevronDown} from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Landmark, Filter, ListOrdered, Info, UsersRound, UserRound, CalendarDays, Building, User} from "lucide-react";
+import { motion } from "framer-motion";
 
 
 /** Formats large numbers for cleaner table display
@@ -70,7 +91,7 @@ const FinancialData = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f9fafe]">
-      <header className="bg-accent text-primary-foreground py-5 px-6 shadow-md">
+      <header className="bg-secondary text-primary-foreground py-5 px-6 shadow-md">
         <div className="container mx-auto flex items-center justify-between">
           <Link href="#" className="flex items-center gap-2 font-semibold text-lg" prefetch={false}>
             <Landmark className="h-6 w-6" />
@@ -83,14 +104,18 @@ const FinancialData = () => {
             <div className="flex flex-wrap items-center gap-4 py-4 pl-4">
 
               {/* FILTER BY DROPDOWN */}
-              <button 
-                className="px-4 py-2 flex items-center gap-2 font-bold rounded-2xl bg-accent text-white"
-                onClick={() => setIsDialogOpen(true)}
+              <motion.div 
+                  whileHover={{ scale: 1.07 }}
+                  whileTap={{ scale: 0.9 }}
               >
-                <Filter className="h-4 w-4" />
-                <span>Filter</span>
-              </button>
-
+                <button 
+                  className="px-4 py-2 flex items-center gap-2 font-bold rounded-2xl bg-secondary text-white"
+                  onClick={() => setIsDialogOpen(true)}
+                >
+                  <Filter className="h-4 w-4" />
+                  <span>Filter</span>
+                </button>
+              </motion.div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogContent className="w-full max-w-md bg-background p-6 rounded-md shadow-lg">
                     <DialogHeader>
@@ -139,41 +164,117 @@ const FinancialData = () => {
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setIsDialogOpen(false)}
+                        className="rounded-lg"
+                      >
                         Cancel
                       </Button>
-                      <Button onClick={() => setIsDialogOpen(false)}>Apply</Button>
+                      <motion.div 
+                          whileHover={{ scale: 1.07 }}
+                          whileTap={{ scale: 0.9 }}
+                      >
+                        <Button 
+                          onClick={() => setIsDialogOpen(false)}
+                          className="px-4 py-2 flex items-center gap-2 font-bold rounded-lg bg-secondary text-white hover:bg-secondary"
+                        >
+                          Apply
+                        </Button>
+                      </motion.div>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
               
 
               {/* SORT BY DROPDOWN */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="border border-gray-300 bg-gray-100 px-6 py-3 rounded-lg flex items-center gap-2 text-gray-700 font-medium hover:bg-gray-200 focus:ring-2 focus:ring-gray-300">
-                    <ListOrdered className="h-4 w-4" />
-                    <span>Sort</span>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuRadioGroup value="date">
-                    <DropdownMenuRadioItem value="date">Date</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="revenue">Revenue</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="netIncome">Net Income</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="grossProfit">Gross Profit</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="eps">EPS</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="operatingIncome">Operating Income</DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <motion.div
+                    whileHover={{ scale: 1.07 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <button className="px-4 py-2 flex items-center gap-2 font-bold rounded-2xl bg-secondary text-white">
+                      <ListOrdered className="w-5 h-5 mr-2" />
+                      Sort
+                    </button>
+                  </motion.div>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <div className="grid gap-4">
+                    <div className="space-y-2">
+                      <h4 className="font-medium leading-none">Sort By</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Sort values by ascending or descending.
+                      </p>
+                    </div>
+                    <div className="grid gap-2">
+                      {/* Select for Date */}
+                      <div className="grid grid-cols-3 items-center gap-4">
+                        <Label htmlFor="dateSelect">Date</Label>
+                        <div className="col-span-2">
+                          <Select>
+                            <SelectTrigger id="dateSelect" className="w-full">
+                              <SelectValue placeholder="Asc/Desc" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectLabel>Sort Order</SelectLabel>
+                                <SelectItem value="asc">Ascending</SelectItem>
+                                <SelectItem value="desc">Descending</SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      {/* Select for Revenue */}
+                      <div className="grid grid-cols-3 items-center gap-4">
+                        <Label htmlFor="revenueSelect">Revenue</Label>
+                        <div className="col-span-2">
+                          <Select>
+                            <SelectTrigger id="revenueSelect" className="w-full">
+                              <SelectValue placeholder="Asc/Desc" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectLabel>Sort Order</SelectLabel>
+                                <SelectItem value="asc">Ascending</SelectItem>
+                                <SelectItem value="desc">Descending</SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      {/* Select for Net Income */}
+                      <div className="grid grid-cols-3 items-center gap-4">
+                        <Label htmlFor="netIncomeSelect">Net Income</Label>
+                        <div className="col-span-2">
+                          <Select>
+                            <SelectTrigger id="netIncomeSelect" className="w-full">
+                              <SelectValue placeholder="Asc/Desc" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectLabel>Sort Order</SelectLabel>
+                                <SelectItem value="asc">Ascending</SelectItem>
+                                <SelectItem value="desc">Descending</SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+
 
               {/* TOGGLE FORMAT BUTTON */}
               <div className="flex items-center space-x-2">
                 <Switch id="toggle-format" onClick={() => setIsFormatted(!isFormatted)} />
-                <Label htmlFor="toggle-format">Toggle Format</Label>
+                <Label htmlFor="toggle-format">Format</Label>
               </div>
             </div>
 
@@ -183,16 +284,156 @@ const FinancialData = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-xl font-extrabold py-4 pl-4 md:pl-6 lg:pl-8 text-black bg-white" colSpan={6}>
-                    Apple Inc. (NASDAQ: AAPL)
+                    <div className="flex items-center gap-2">
+                      Apple Inc. (NASDAQ: AAPL)
+                      <Dialog>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <DialogTrigger asChild>
+                              <TooltipTrigger asChild>
+                                <button className="relative">
+                                  <Info className="w-5 h-5 ml-4 mt-1 text-gray-600 hover:text-black" />
+                                </button>
+                              </TooltipTrigger>
+                            </DialogTrigger>
+                            <TooltipContent>
+                              <p>Learn about AAPL</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <DialogContent className="sm:max-w-[600px]">
+                          <DialogHeader>
+                            <DialogTitle>Apple Inc.</DialogTitle>
+                            <DialogDescription>A brief overview of the tech giant.</DialogDescription>
+                          </DialogHeader>
+                          <div className="py-4">
+                            {/* Grid for CEO, Founded, Employees, Headquarters */}
+                            <div className="grid grid-cols-2 gap-6 text-center">
+                              <div className="flex flex-col items-start gap-2">
+                                <div className="flex items-center gap-2">
+                                  <p className="font-sm text-gray-500">CEO</p>
+                                  <UserRound className="w-4 h-4 text-gray-500" />
+                                </div>
+                                <p>Timothy Donald Cook</p>
+                              </div>
+                              <div className="flex flex-col items-start gap-2">
+                                <div className="flex items-center gap-2">
+                                  <p className="font-sm text-gray-500">Founded</p>
+                                  <CalendarDays className="w-4 h-4 text-gray-500" />
+                                </div>
+                                <p>1976</p>
+                              </div>
+                              <div className="flex flex-col items-start gap-2">
+                                <div className="flex items-center gap-2">
+                                  <p className="font-sm text-gray-500">Employees</p>
+                                  <UsersRound className="w-4 h-4 text-gray-500" />
+                                </div>
+                                <p>164,000</p>
+                              </div>
+                              <div className="flex flex-col items-start gap-2">
+                                <div className="flex items-center gap-2">
+                                  <p className="font-sm text-gray-500">Headquarters</p>
+                                  <Building className="w-4 h-4 text-gray-500" />
+                                </div>
+                                <p>Cupertino, California</p>
+                              </div>
+                            </div>
+
+                            {/* Description outside the grid */}
+                            <ScrollArea className="rounded-xl border border-gray-200 p-4 max-h-40 overflow-y-auto mt-8">
+                              <p className="text-muted-foreground">
+                                Apple, Inc. engages in the design, manufacture, and sale of smartphones, personal computers, 
+                                tablets, wearables and accessories, and other varieties of related services. It operates through the 
+                                following geographical segments: Americas, Europe, Greater China, Japan, and Rest of Asia Pacific. 
+                                The Americas segment includes North and South America. The Europe segment consists of European 
+                                countries, as well as India, the Middle East, and Africa. The Greater China segment comprises China, 
+                                Hong Kong, and Taiwan. The Rest of Asia Pacific segment includes Australia and Asian countries. 
+                                Its products and services include iPhone, Mac, iPad, AirPods, Apple TV, Apple Watch, Beats products, 
+                                AppleCare, iCloud, digital content stores, streaming, and licensing services. The company was founded 
+                                by Steven Paul Jobs, Ronald Gerald Wayne, and Stephen G. Wozniak in April 1976 and is headquartered 
+                                in Cupertino, CA. The listed name for AAPL is Apple Inc. Common Stock.
+                              </p>
+                            </ScrollArea>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+
+                    </div>
                   </TableHead>
                 </TableRow>
                 <TableRow className="bg-gray-100">
-                  <TableHead className="text-center w-1/6 py-4 px-4">Date</TableHead>
-                  <TableHead className="text-center w-1/6 py-4 px-4">Revenue</TableHead>
-                  <TableHead className="text-center w-1/6 py-4 px-4">Net Income</TableHead>
-                  <TableHead className="text-center w-1/6 py-4 px-4">Gross Profit</TableHead>
-                  <TableHead className="text-center w-1/6 py-4 px-4">EPS</TableHead>
-                  <TableHead className="text-center w-1/6 py-4 px-4">Operating Income</TableHead>
+                  <TableHead className="text-center w-1/6 py-4 px-4">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="nav-link">Date</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Date of Income Statement</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableHead>
+                  <TableHead className="text-center w-1/6 py-4 px-4">
+                    <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="nav-link">Revenue</span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Total money earned from sales</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                  </TableHead>
+                  <TableHead className="text-center w-1/6 py-4 px-4">
+                    <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="nav-link">Net Income</span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Profit after all expenses, taxes, and costs</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                  </TableHead>
+                  <TableHead className="text-center w-1/6 py-4 px-4">
+                    <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="nav-link">Gross Profit</span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Revenue minus direct costs (e.g., manufacturing)</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                  </TableHead>
+                  <TableHead className="text-center w-1/6 py-4 px-4">
+                    <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="nav-link">EPS</span> 
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>(Earnings Per Share): Net income divided by total shares</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                  </TableHead>
+                  <TableHead className="text-center w-1/6 py-4 px-4">
+                    <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="nav-link">Operating Income</span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Profit from core operations before taxes and interest</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className="bg-white">
@@ -221,15 +462,7 @@ const FinancialData = () => {
       </main>
       <footer className="bg-muted text-muted-foreground py-4 px-6">
         <div className="container mx-auto flex items-center justify-between">
-          <p className="text-sm">&copy; 2023 AAPL Financials. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            <Link href="#" className="hover:underline" prefetch={false}>
-              Privacy Policy
-            </Link>
-            <Link href="#" className="hover:underline" prefetch={false}>
-              Terms of Service
-            </Link>
-          </div>
+          <p className="text-sm">&copy; 2025 Financial Hub. All rights reserved.</p>
         </div>
       </footer>
     </div>
@@ -245,179 +478,53 @@ export default FinancialData;
 
 // /**
 //  * v0 by Vercel.
-//  * @see https://v0.dev/t/RNiYxwh2swb
+//  * @see https://v0.dev/t/Iqitzanp9mF
 //  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
 //  */
-// "use client"
-
-// import { useState, useMemo } from "react"
-// import Link from "next/link"
+// import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 // import { Button } from "@/components/ui/button"
-// import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuRadioGroup, DropdownMenuRadioItem } from "@/components/ui/dropdown-menu"
-// import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-// import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogBody, DialogFooter } from "@/components/ui/dialog"
-// import { Label } from "@/components/ui/label"
-// import { Input } from "@/components/ui/input"
 
 // export default function Component() {
-//   const [filterOpen, setFilterOpen] = useState(false)
-//   const [sortOpen, setSortOpen] = useState(false)
-//   const [dateRange, setDateRange] = useState({ min: 2020, max: 2024 })
-//   const [revenueRange, setRevenueRange] = useState({ min: 0, max: 1000000 })
-//   const [netIncomeRange, setNetIncomeRange] = useState({ min: 0, max: 100000 })
-//   const [sortBy, setSortBy] = useState("date")
-//   const [sortOrder, setSortOrder] = useState("asc")
-//   const data = [
-//     { id: 1, date: "2021-03-15", revenue: 500000, netIncome: 50000 },
-//     { id: 2, date: "2022-07-01", revenue: 750000, netIncome: 75000 },
-//     { id: 3, date: "2023-11-30", revenue: 600000, netIncome: 60000 },
-//     { id: 4, date: "2024-05-20", revenue: 800000, netIncome: 80000 },
-//     { id: 5, date: "2020-09-01", revenue: 400000, netIncome: 40000 },
-//   ]
-//   const filteredData = useMemo(() => {
-//     return data.filter((item) => {
-//       const year = new Date(item.date).getFullYear()
-//       return (
-//         year >= dateRange.min &&
-//         year <= dateRange.max &&
-//         item.revenue >= revenueRange.min &&
-//         item.revenue <= revenueRange.max &&
-//         item.netIncome >= netIncomeRange.min &&
-//         item.netIncome <= netIncomeRange.max
-//       )
-//     })
-//   }, [dateRange, revenueRange, netIncomeRange])
-//   const sortedData = useMemo(() => {
-//     return filteredData.sort((a, b) => {
-//       if (sortBy === "date") {
-//         return sortOrder === "asc"
-//           ? new Date(a.date).getTime() - new Date(b.date).getTime()
-//           : new Date(b.date).getTime() - new Date(a.date).getTime()
-//       } else if (sortBy === "revenue") {
-//         return sortOrder === "asc" ? a.revenue - b.revenue : b.revenue - a.revenue
-//       } else {
-//         return sortOrder === "asc" ? a.netIncome - b.netIncome : b.netIncome - a.netIncome
-//       }
-//     })
-//   }, [filteredData, sortBy, sortOrder])
 //   return (
-//     <div className="flex flex-col h-screen">
-//       <header className="bg-primary text-primary-foreground py-4 px-6 flex items-center justify-between">
-//         <div className="flex items-center gap-4">
-//           <Link href="#" className="text-xl font-bold" prefetch={false}>
-//             My App
-//           </Link>
-//           <Button variant="outline" onClick={() => setFilterOpen(true)} className="px-4 py-2">
-//             <FilterIcon className="w-5 h-5 mr-2" />
-//             Filter
-//           </Button>
-//         </div>
-//         <DropdownMenu>
-//           <DropdownMenuTrigger asChild>
-//             <Button variant="outline" className="px-4 py-2">
-//               <ListOrderedIcon className="w-5 h-5 mr-2" />
-//               Sort
-//             </Button>
-//           </DropdownMenuTrigger>
-//           <DropdownMenuContent className="w-56">
-//             <DropdownMenuLabel>Sort By</DropdownMenuLabel>
-//             <DropdownMenuSeparator />
-//             <DropdownMenuRadioGroup value={sortBy} onValueChange={(value) => setSortBy(value)}>
-//               <DropdownMenuRadioItem value="date">Date</DropdownMenuRadioItem>
-//               <DropdownMenuRadioItem value="revenue">Revenue</DropdownMenuRadioItem>
-//               <DropdownMenuRadioItem value="netIncome">Net Income</DropdownMenuRadioItem>
-//             </DropdownMenuRadioGroup>
-//             <DropdownMenuSeparator />
-//             <DropdownMenuRadioGroup value={sortOrder} onValueChange={(value) => setSortOrder(value)}>
-//               <DropdownMenuRadioItem value="asc">Ascending</DropdownMenuRadioItem>
-//               <DropdownMenuRadioItem value="desc">Descending</DropdownMenuRadioItem>
-//             </DropdownMenuRadioGroup>
-//           </DropdownMenuContent>
-//         </DropdownMenu>
-//       </header>
-//       <main className="flex-1 overflow-y-auto">
-//         <div className="container mx-auto py-8 px-6">
-//           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-//             {sortedData.map((item) => (
-//               <Card key={item.id}>
-//                 <CardHeader>
-//                   <CardTitle>{item.date}</CardTitle>
-//                 </CardHeader>
-//                 <CardContent>
-//                   <div className="space-y-2">
-//                     <div>
-//                       <span className="font-medium">Revenue:</span>{" "}
-//                       {item.revenue.toLocaleString("en-US", {
-//                         style: "currency",
-//                         currency: "USD",
-//                       })}
-//                     </div>
-//                     <div>
-//                       <span className="font-medium">Net Income:</span>{" "}
-//                       {item.netIncome.toLocaleString("en-US", {
-//                         style: "currency",
-//                         currency: "USD",
-//                       })}
-//                     </div>
-//                   </div>
-//                 </CardContent>
-//               </Card>
-//             ))}
-//           </div>
-//         </div>
-//       </main>
+//     <div className="flex min-h-screen flex-col items-center justify-center bg-background">
 //       <Dialog>
-//         <DialogContent className="w-full max-w-md bg-background p-6 rounded-md shadow-lg">
+//         <DialogTrigger asChild>
+//           <Button variant="outline" className="mb-4">
+//             Learn About Apple
+//           </Button>
+//         </DialogTrigger>
+//         <DialogContent className="sm:max-w-[600px]">
 //           <DialogHeader>
-//             <DialogTitle>Filter</DialogTitle>
-//             <DialogDescription>Adjust the filters to refine your search.</DialogDescription>
+//             <DialogTitle>Apple Inc.</DialogTitle>
+//             <DialogDescription>A brief overview of the tech giant.</DialogDescription>
 //           </DialogHeader>
-//           <div className="space-y-4">
-//             <div className="space-y-2">
-//               <Label htmlFor="dateRange">Date Range</Label>
-//               <div className="flex items-center gap-4">
-//                 <Input
-//                   id="dateRange"
-//                   type="number"
-//                 />
-//                 <span>-</span>
-//                 <Input
-//                   type="number"
-//                 />
-//               </div>
+//           <div className="grid gap-4 py-4">
+//             <div className="grid grid-cols-[100px_1fr] items-center gap-4">
+//               <p className="font-medium">CEO:</p>
+//               <p>Tim Cook</p>
 //             </div>
-//             <div className="space-y-2">
-//               <Label htmlFor="revenueRange">Revenue Range</Label>
-//               <div className="flex items-center gap-4">
-//                 <Input
-//                   id="revenueRange"
-//                   type="number"
-//                 />
-//                 <span>-</span>
-//                 <Input
-//                   type="number"
-//                 />
-//               </div>
+//             <div className="grid grid-cols-[100px_1fr] items-center gap-4">
+//               <p className="font-medium">Founded:</p>
+//               <p>1976</p>
 //             </div>
-//             <div className="space-y-2">
-//               <Label htmlFor="netIncomeRange">Net Income Range</Label>
-//               <div className="flex items-center gap-4">
-//                 <Input
-//                   id="netIncomeRange"
-//                   type="number"
-//                 />
-//                 <span>-</span>
-//                 <Input
-//                   type="number"
-//                 />
-//               </div>
+//             <div className="grid grid-cols-[100px_1fr] items-center gap-4">
+//               <p className="font-medium">Employees:</p>
+//               <p>154,000+</p>
 //             </div>
+//             <div className="grid grid-cols-[100px_1fr] items-center gap-4">
+//               <p className="font-medium">Headquarters:</p>
+//               <p>Cupertino, California</p>
+//             </div>
+//             <p className="text-muted-foreground">
+//               Apple Inc. is an American multinational technology company that specializes in consumer electronics,
+//               software, and online services. It is considered one of the Big Tech companies in the U.S. information
+//               technology industry, alongside Amazon, Google, Microsoft, and Meta (Facebook).
+//             </p>
 //           </div>
 //           <DialogFooter>
-//             <Button variant="outline">
-//               Cancel
+//             <Button variant="outline" onClick={() => {}}>
+//               Close
 //             </Button>
-//             <Button>Apply</Button>
 //           </DialogFooter>
 //         </DialogContent>
 //       </Dialog>
