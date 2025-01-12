@@ -5,7 +5,10 @@ from datetime import datetime
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": [
+    "https://financial-data-4ma1uustx-adam-sadovs-projects.vercel.app",
+    "http://localhost:3000" 
+]}})
 
 API_URL = "https://financialmodelingprep.com/api/v3/income-statement/AAPL?period=annual"
 API_KEY = os.getenv("NEXT_PUBLIC_API_KEY")
@@ -67,9 +70,8 @@ def fetch_data():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=True)
 
 
 
