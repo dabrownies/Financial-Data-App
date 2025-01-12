@@ -11,6 +11,14 @@ CORS(app)
 def home():
     return "Flask API is running"
 
+@app.route('/test')
+def test():
+    try:
+        response = requests.get(f"{API_URL}&apikey={API_KEY}")
+        return jsonify({"status": "ok", "api_response": response.status_code})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 API_URL = "https://financialmodelingprep.com/api/v3/income-statement/AAPL?period=annual"
 API_KEY = os.getenv("NEXT_PUBLIC_API_KEY")
 
