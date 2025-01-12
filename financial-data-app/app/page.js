@@ -4,15 +4,6 @@ import React, { useEffect, useState } from "react";
 import fetchFinancialData from "@/api/fetchFinancialData";
 
 import Link from "next/link"
-import { 
-  DropdownMenu, 
-  DropdownMenuTrigger, 
-  DropdownMenuContent, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuCheckboxItem, 
-  DropdownMenuRadioGroup, 
-  DropdownMenuRadioItem } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell} from "@/components/ui/table"
@@ -85,25 +76,46 @@ const FinancialData = () => {
    *  @sets setFilteredData to contain the data filtered within the specificed range
    *  @sets query states to handle when queries yield no results
    */
-  const applyFilters = () => {
-    const results = data.filter((item) => {
-      const dateValid =
-        (!dateStart || parseInt(item.date, 10) >= parseInt(dateStart || 0, 10)) &&
-        (!dateEnd || parseInt(item.date, 10) <= parseInt(dateEnd || Infinity, 10));
-      const revenueValid =
-        (!revenueMin || parseFloat(item.revenue) >= parseFloat(revenueMin || 0)) &&
-        (!revenueMax || parseFloat(item.revenue) <= parseFloat(revenueMax || Infinity));
-      const netIncomeValid =
-        (!netIncomeMin || parseFloat(item.netIncome) >= parseFloat(netIncomeMin || 0)) &&
-        (!netIncomeMax || parseFloat(item.netIncome) <= parseFloat(netIncomeMax || Infinity));
-  
-      return dateValid && revenueValid && netIncomeValid;
-    });
-  
-    setFilteredData(results);
-    setQuery(true);
-    setIsDialogOpen(false);
-  };
+  const applyFilters = async () => {
+    const queryParams = new URLSearchParams();
+
+    if (dateStart) queryParams.append("year_start", dateStart);
+    if (dateEnd) queryParams.append("year_end", dateEnd);
+    if (revenueMin) queryParams.append("min_revenue", revenueMin);
+    if (revenueMax) queryParams.append("max_revenue", revenueMax);
+    if (netIncomeMin) queryParams.append("min_net_income", netIncomeMin);
+    if (netIncomeMax) queryParams.append("max_net_income", netIncomeMax);
+
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/data?${queryParams.toString()}`);
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        const results = data.filter((item) => {
+            const dateValid =
+                (!dateStart || parseInt(item.date, 10) >= parseInt(dateStart || 0, 10)) &&
+                (!dateEnd || parseInt(item.date, 10) <= parseInt(dateEnd || Infinity, 10));
+            const revenueValid =
+                (!revenueMin || parseFloat(item.revenue) >= parseFloat(revenueMin || 0)) &&
+                (!revenueMax || parseFloat(item.revenue) <= parseFloat(revenueMax || Infinity));
+            const netIncomeValid =
+                (!netIncomeMin || parseFloat(item.netIncome) >= parseFloat(netIncomeMin || 0)) &&
+                (!netIncomeMax || parseFloat(item.netIncome) <= parseFloat(netIncomeMax || Infinity));
+
+            return dateValid && revenueValid && netIncomeValid;
+        });
+
+        setFilteredData(results);
+        setQuery(true);
+        setIsDialogOpen(false);
+    } catch (error) {
+        console.error("Error fetching filtered data:", error);
+    }
+};
+
   
   /** Retrieves query responses from user input from server side
    *  @sets setFilteredData to contain the data sorted by the user's specifications
@@ -115,7 +127,7 @@ const FinancialData = () => {
         sort_order: sortOrder,
       });
   
-      const response = await fetch(`http://127.0.0.1:5000/data?${queryParams.toString()}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/data?${queryParams.toString()}`);
       if (!response.ok) {
         throw new Error(`HTTP Error: ${response.status}`);
       }
