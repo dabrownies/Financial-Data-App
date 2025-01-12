@@ -40,7 +40,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Landmark, Filter, ListOrdered, Info, UsersRound, UserRound, CalendarDays, Building, User} from "lucide-react";
+import { Landmark, Filter, ListOrdered, Info, UsersRound, UserRound, CalendarDays, Building, SearchX} from "lucide-react";
 import { motion } from "framer-motion";
 
 
@@ -68,7 +68,65 @@ const FinancialData = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFormatted, setIsFormatted] = useState(true);
+  const [dateStart, setDateStart] = useState("");
+  const [dateEnd, setDateEnd] = useState("");
+  const [revenueMin, setRevenueMin] = useState("");
+  const [revenueMax, setRevenueMax] = useState("");
+  const [netIncomeMin, setNetIncomeMin] = useState("");
+  const [netIncomeMax, setNetIncomeMax] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [sortBy, setSortBy] = useState(""); 
+  const [sortOrder, setSortOrder] = useState(""); 
+  const [query, setQuery] = useState(false);
+
+
+  /** Retrieves query responses from user input from server side
+   *  @sets setFilteredData to contain the data filtered within the specificed range
+   *  @sets query states to handle when queries yield no results
+   */
+  const applyFilters = () => {
+    const results = data.filter((item) => {
+      const dateValid =
+        (!dateStart || parseInt(item.date, 10) >= parseInt(dateStart || 0, 10)) &&
+        (!dateEnd || parseInt(item.date, 10) <= parseInt(dateEnd || Infinity, 10));
+      const revenueValid =
+        (!revenueMin || parseFloat(item.revenue) >= parseFloat(revenueMin || 0)) &&
+        (!revenueMax || parseFloat(item.revenue) <= parseFloat(revenueMax || Infinity));
+      const netIncomeValid =
+        (!netIncomeMin || parseFloat(item.netIncome) >= parseFloat(netIncomeMin || 0)) &&
+        (!netIncomeMax || parseFloat(item.netIncome) <= parseFloat(netIncomeMax || Infinity));
+  
+      return dateValid && revenueValid && netIncomeValid;
+    });
+  
+    setFilteredData(results);
+    setQuery(true);
+    setIsDialogOpen(false);
+  };
+  
+  /** Retrieves query responses from user input from server side
+   *  @sets setFilteredData to contain the data sorted by the user's specifications
+   */
+  const applySorting = async () => {
+    try {
+      const queryParams = new URLSearchParams({
+        sort_by: sortBy,
+        sort_order: sortOrder,
+      });
+  
+      const response = await fetch(`http://127.0.0.1:5000/data?${queryParams.toString()}`);
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+  
+      const sortedData = await response.json();
+      setFilteredData(sortedData); 
+    } catch (error) {
+      console.error("Error applying sorting:", error);
+    }
+  };
+
 
   useEffect(() => {
     const getData = async () => {
@@ -85,6 +143,7 @@ const FinancialData = () => {
     getData();
   }, []);
 
+  // loading animation
   if (loading) {
     return <div>Loading data...</div>;
   }
@@ -124,60 +183,82 @@ const FinancialData = () => {
                     </DialogHeader>
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="dateRange">Date Range</Label>
+                        <Label htmlFor="yearStart">Date Range</Label>
                         <div className="flex items-center gap-4">
                           <Input
-                            id="dateRange"
+                            id="yearStart"
                             type="number"
+                            placeholder="Start Year (e.g., 2020)"
+                            value={dateStart}
+                            onChange={(e) => setDateStart(e.target.value)}
                           />
                           <span>-</span>
                           <Input
+                            id="yearEnd"
                             type="number"
+                            placeholder="End Year (e.g., 2022)"
+                            value={dateEnd}
+                            onChange={(e) => setDateEnd(e.target.value)}
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="revenueRange">Revenue Range</Label>
+                        <Label htmlFor="revenueMin">Revenue Range</Label>
                         <div className="flex items-center gap-4">
                           <Input
-                            id="revenueRange"
+                            id="revenueMin"
                             type="number"
+                            placeholder="Min Revenue"
+                            value={revenueMin}
+                            onChange={(e) => setRevenueMin(e.target.value)}
                           />
                           <span>-</span>
                           <Input
+                            id="revenueMax"
                             type="number"
+                            placeholder="Max Revenue"
+                            value={revenueMax}
+                            onChange={(e) => setRevenueMax(e.target.value)}
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="netIncomeRange">Net Income Range</Label>
+                        <Label htmlFor="netIncomeMin">Net Income Range</Label>
                         <div className="flex items-center gap-4">
                           <Input
-                            id="netIncomeRange"
+                            id="netIncomeMin"
                             type="number"
+                            placeholder="Min Net Income"
+                            value={netIncomeMin}
+                            onChange={(e) => setNetIncomeMin(e.target.value)}
                           />
                           <span>-</span>
                           <Input
+                            id="netIncomeMax"
                             type="number"
+                            placeholder="Max Net Income"
+                            value={netIncomeMax}
+                            onChange={(e) => setNetIncomeMax(e.target.value)}
                           />
                         </div>
                       </div>
                     </div>
-                    <DialogFooter>
+                    <DialogFooter className="flex flex-col sm:flex-row justify-center gap-2">
                       <Button 
                         variant="outline" 
                         onClick={() => setIsDialogOpen(false)}
-                        className="rounded-lg"
+                        className="rounded-lg w-full sm:w-auto"
                       >
                         Cancel
                       </Button>
                       <motion.div 
-                          whileHover={{ scale: 1.07 }}
-                          whileTap={{ scale: 0.9 }}
+                        whileHover={{ scale: 1.07 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="w-full sm:w-auto"
                       >
                         <Button 
-                          onClick={() => setIsDialogOpen(false)}
-                          className="px-4 py-2 flex items-center gap-2 font-bold rounded-lg bg-secondary text-white hover:bg-secondary"
+                          onClick={applyFilters}
+                          className="w-full sm:w-auto px-4 py-2 flex items-center gap-2 font-bold rounded-lg bg-secondary text-white hover:bg-secondary"
                         >
                           Apply
                         </Button>
@@ -213,7 +294,12 @@ const FinancialData = () => {
                       <div className="grid grid-cols-3 items-center gap-4">
                         <Label htmlFor="dateSelect">Date</Label>
                         <div className="col-span-2">
-                          <Select>
+                          <Select
+                            onValueChange={(value) => {
+                              setSortBy("date");
+                              setSortOrder(value);
+                            }}
+                          >
                             <SelectTrigger id="dateSelect" className="w-full">
                               <SelectValue placeholder="Asc/Desc" />
                             </SelectTrigger>
@@ -227,12 +313,16 @@ const FinancialData = () => {
                           </Select>
                         </div>
                       </div>
-
                       {/* Select for Revenue */}
                       <div className="grid grid-cols-3 items-center gap-4">
                         <Label htmlFor="revenueSelect">Revenue</Label>
                         <div className="col-span-2">
-                          <Select>
+                          <Select
+                            onValueChange={(value) => {
+                              setSortBy("revenue");
+                              setSortOrder(value);
+                            }}
+                          >
                             <SelectTrigger id="revenueSelect" className="w-full">
                               <SelectValue placeholder="Asc/Desc" />
                             </SelectTrigger>
@@ -246,12 +336,16 @@ const FinancialData = () => {
                           </Select>
                         </div>
                       </div>
-
                       {/* Select for Net Income */}
                       <div className="grid grid-cols-3 items-center gap-4">
                         <Label htmlFor="netIncomeSelect">Net Income</Label>
                         <div className="col-span-2">
-                          <Select>
+                          <Select
+                            onValueChange={(value) => {
+                              setSortBy("netIncome");
+                              setSortOrder(value);
+                            }}
+                          >
                             <SelectTrigger id="netIncomeSelect" className="w-full">
                               <SelectValue placeholder="Asc/Desc" />
                             </SelectTrigger>
@@ -265,6 +359,20 @@ const FinancialData = () => {
                           </Select>
                         </div>
                       </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <motion.div
+                        whileHover={{ scale: 1.07 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="inline-block"
+                      >
+                        <Button
+                          onClick={applySorting}
+                          className="w-full sm:w-auto px-4 py-2 flex items-center gap-2 font-bold rounded-lg bg-secondary text-white hover:bg-secondary"
+                        >
+                          Apply
+                        </Button>
+                      </motion.div>
                     </div>
                   </div>
                 </PopoverContent>
@@ -307,7 +415,7 @@ const FinancialData = () => {
                             <DialogDescription>A brief overview of the tech giant.</DialogDescription>
                           </DialogHeader>
                           <div className="py-4">
-                            {/* Grid for CEO, Founded, Employees, Headquarters */}
+                            {/* Info Card */}
                             <div className="grid grid-cols-2 gap-6 text-center">
                               <div className="flex flex-col items-start gap-2">
                                 <div className="flex items-center gap-2">
@@ -338,8 +446,6 @@ const FinancialData = () => {
                                 <p>Cupertino, California</p>
                               </div>
                             </div>
-
-                            {/* Description outside the grid */}
                             <ScrollArea className="rounded-xl border border-gray-200 p-4 max-h-40 overflow-y-auto mt-8">
                               <p className="text-muted-foreground">
                                 Apple, Inc. engages in the design, manufacture, and sale of smartphones, personal computers, 
@@ -437,24 +543,38 @@ const FinancialData = () => {
                 </TableRow>
               </TableHeader>
               <TableBody className="bg-white">
-                {data.map((item) => (
-                  <TableRow key={item.date}>
-                    <TableCell className="text-center w-1/6 py-4">{item.date}</TableCell>
-                    <TableCell className="text-center w-1/6 py-4">
-                      {isFormatted ? formatNumber(item.revenue) : `$${item.revenue.toLocaleString()}`}
-                    </TableCell>
-                    <TableCell className="text-center w-1/6 py-4">
-                      {isFormatted ? formatNumber(item.netIncome) : `$${item.netIncome.toLocaleString()}`}
-                    </TableCell>
-                    <TableCell className="text-center w-1/6 py-4">
-                      {isFormatted ? formatNumber(item.grossProfit) : `$${item.grossProfit.toLocaleString()}`}
-                    </TableCell>
-                    <TableCell className="text-center w-1/6 py-4">{item.eps.toFixed(2)}</TableCell>
-                    <TableCell className="text-center w-1/6 py-4">
-                      {isFormatted ? formatNumber(item.operatingIncome) : `$${item.operatingIncome.toLocaleString()}`}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {query && filteredData.length === 0 ? (
+                  <TableRow>
+                  <TableCell colSpan={6} className="text-center py-24">
+                    <div className="flex flex-col items-center space-y-2">
+                      <SearchX className="w-10 h-10" />
+                      <span className="text-2xl font-bold">Well, this is awkward...</span>
+                      <span className="text-sm font-medium text-gray-600">
+                        Seems your search yielded no results.
+                      </span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+                ) : (
+                  (filteredData.length > 0 ? filteredData : data).map((item) => (
+                    <TableRow key={item.date}>
+                      <TableCell className="text-center w-1/6 py-4">{item.date}</TableCell>
+                      <TableCell className="text-center w-1/6 py-4">
+                        {isFormatted ? formatNumber(item.revenue) : `$${item.revenue.toLocaleString()}`}
+                      </TableCell>
+                      <TableCell className="text-center w-1/6 py-4">
+                        {isFormatted ? formatNumber(item.netIncome) : `$${item.netIncome.toLocaleString()}`}
+                      </TableCell>
+                      <TableCell className="text-center w-1/6 py-4">
+                        {isFormatted ? formatNumber(item.grossProfit) : `$${item.grossProfit.toLocaleString()}`}
+                      </TableCell>
+                      <TableCell className="text-center w-1/6 py-4">{item.eps.toFixed(2)}</TableCell>
+                      <TableCell className="text-center w-1/6 py-4">
+                        {isFormatted ? formatNumber(item.operatingIncome) : `$${item.operatingIncome.toLocaleString()}`}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
