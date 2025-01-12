@@ -7,27 +7,13 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/')
-def home():
-    return "Flask API is running"
-
-@app.route('/test')
-def test():
-    try:
-        response = requests.get(f"{API_URL}&apikey={API_KEY}")
-        return jsonify({"status": "ok", "api_response": response.status_code})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
 API_URL = "https://financialmodelingprep.com/api/v3/income-statement/AAPL?period=annual"
 API_KEY = os.getenv("NEXT_PUBLIC_API_KEY")
 
 @app.route('/data', methods=['GET'])
 def fetch_data():
     try:
-        print("Fetching data...") # Debug print
         response = requests.get(f"{API_URL}&apikey={API_KEY}")
-        print(f"Response status: {response.status_code}") # Debug print
         response.raise_for_status()
         data = response.json()
         
@@ -67,7 +53,7 @@ def fetch_data():
         return jsonify(filtered_data)
         
     except Exception as e:
-        print(f"Error: {str(e)}") # Debug print
+        print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':

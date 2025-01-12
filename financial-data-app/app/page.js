@@ -87,15 +87,12 @@ const FinancialData = () => {
     if (netIncomeMax) queryParams.append("max_net_income", netIncomeMax);
 
     try {
-      console.log("Starting API request");
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/data?${queryParams.toString()}`);
-        console.log("Response status:", response.status);
         if (!response.ok) {
             throw new Error(`HTTP Error: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log("Received data:", data);
 
         const results = data.filter((item) => {
             const dateValid =
