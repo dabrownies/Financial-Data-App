@@ -10,6 +10,10 @@ CORS(app)
 API_URL = "https://financialmodelingprep.com/api/v3/income-statement/AAPL?period=annual"
 API_KEY = os.getenv("NEXT_PUBLIC_API_KEY")
 
+@app.route('/')
+def home():
+    return "Flask API is running"
+
 @app.route('/data', methods=['GET'])
 def fetch_data():
     try:
@@ -51,9 +55,7 @@ def fetch_data():
             filtered_data = sorted(filtered_data, key=lambda x: x.get(sort_by, 0), reverse=reverse)
             
         return jsonify(filtered_data)
-        
     except Exception as e:
-        print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
