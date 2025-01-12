@@ -122,18 +122,23 @@ const FinancialData = () => {
    */
   const applySorting = async () => {
     try {
-      const queryParams = new URLSearchParams({
-        sort_by: sortBy,
-        sort_order: sortOrder,
-      });
+      const queryParams = new URLSearchParams();
+      queryParams.append("sort_by", sortBy);
+      queryParams.append("sort_order", sortOrder);
+      
+      if (dateStart) queryParams.append("year_start", dateStart);
+      if (dateEnd) queryParams.append("year_end", dateEnd);
+      if (revenueMin) queryParams.append("min_revenue", revenueMin);
+      if (revenueMax) queryParams.append("max_revenue", revenueMax);
+      if (netIncomeMin) queryParams.append("min_net_income", netIncomeMin);
+      if (netIncomeMax) queryParams.append("max_net_income", netIncomeMax);
   
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/data?${queryParams.toString()}`);
       if (!response.ok) {
         throw new Error(`HTTP Error: ${response.status}`);
       }
-  
       const sortedData = await response.json();
-      setFilteredData(sortedData); 
+      setFilteredData(sortedData);
     } catch (error) {
       console.error("Error applying sorting:", error);
     }
