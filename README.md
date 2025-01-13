@@ -130,23 +130,23 @@ Use browser of choice to open
 
    3a. Format currency values for sleeker tables or more precise numbers. With Format ON, you can view large values in their original number for precise calculations.
 
-   ![Format ON Screenshot](./public/images/FormatOn.png)
+   ![Format ON Screenshot](financial-data-app/public/images/FormatOn.png)
 
    3b. With Format OFF, you can keep large values in their truncated form (T for trillions, B for billions, M for millions) to have a cleaner table look.
 
-   ![Format OFF Screenshot](./public/images/FormatOFF.png)
+   ![Format OFF Screenshot](financial-data-app/public/images/FormatOFF.png)
 
    4. Learn more about every table row header so you know exactly what you're looking at.
 
-   ![Header Info Screenshot](./public/images/HeaderInfo.png)
+   ![Header Info Screenshot](financial-data-app/public/images/HeaderInfo.png)
 
    5. Filter your search. Specify which rows you want to display by specifying their value ranges, then click Apply to save those changes.
 
-   ![Filter Screenshot](./public/images/Filter.png)
+   ![Filter Screenshot](financial-data-app/public/images/Filter.png)
 
    6. Sort your table. Specify in which order and which values you want to sort, then click Apply to save those changes.
 
-   ![Sort Screenshot](./public/images/Sort.png)
+   ![Sort Screenshot](financial-data-app/public/images/Sort.png)
 
 
 ## Open Source License
