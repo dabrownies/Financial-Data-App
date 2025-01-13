@@ -89,8 +89,9 @@ touch .env.local
 3. Once you log in, if not already redirected, select **Dashboard** on the top right.
 4. You should see your API Key under **API Keys**, if not, select **API Details** with a Key Icon on the left.
 5. Create your key and **copy** it.
-6. Insert these values into your `.env.local` file:
+6. Add your key into your `.env.local` file:
 ```bash
+# Open file via terminal:
 nano .env.local
 # Add the following:
 NEXT_PUBLIC_API_KEY=<your_api_key_here>
