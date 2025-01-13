@@ -126,7 +126,7 @@ Use browser of choice to open
    1. The data will already be present and displayed on the table.
    2. Learn about the compnay you're researching. This gives a brief overview of the company's operations, location, CEO, employee count, etc.
 
-   ![Learn About Company Screenshot](./public/images/LearnAboutCompany.png)
+   ![Learn About Company Screenshot](financial-data-app/public/images/LearnAboutCompany.png)
 
    3a. Format currency values for sleeker tables or more precise numbers. With Format ON, you can view large values in their original number for precise calculations.
 
