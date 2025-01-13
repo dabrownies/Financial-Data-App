@@ -84,7 +84,7 @@ touch .env.local
 
 ### How to Retrieve Financial Modeling Prep (FMP) API Key:
 
-1. Go to ([https://console.firebase.google.com/](https://site.financialmodelingprep.com)).
+1. Go to ([https://site.financialmodelingprep.com/](https://site.financialmodelingprep.com)).
 2. Click on **Sign Up** to create an account or log in.
 3. Once you log in, if not already redirected, select **Dashboard** on the top right.
 4. You should see your API Key under **API Keys**, if not, select **API Details** with a Key Icon on the left.
