@@ -142,7 +142,7 @@ Use browser of choice to open
 
    5. Filter your search. Specify which rows you want to display by specifying their value ranges, then click Apply to save those changes.
 
-   ![Filter Screenshot](financial-data-app/public/images/Filter.png)
+   ![Filter Screenshot](financial-data-app/public/images/FIlter.png)
 
    6. Sort your table. Specify in which order and which values you want to sort, then click Apply to save those changes.
 
