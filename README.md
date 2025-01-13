@@ -6,7 +6,7 @@ The Financial Data Filtering App is a web application designed to streamline the
 
 The app features a Flask API backend for managing and serving data and a dynamic frontend interface that enables users to interact with the data seamlessly. This tool is ideal for begineer investors who want to process and review financial data efficiently. The app has several pointers and useful information to help newcomers understand technical terms.
 
-User's have access to a robust front end platform powered by React and Next.js.
+Users have access to a robust front end platform powered by React and Next.js.
 All data is fetched from external API endpoints and all filtered/sorted data is processed server-side using Flask.
 
 ## Technologies Used
