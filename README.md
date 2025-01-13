@@ -21,6 +21,9 @@ All data is fetched from external API endpoints and all filtered/sorted data is 
 - **Shadcn/ui**: Provided UI components for user interaction.
 - **Framer-Motion**: Used to create UI implementation.
 
+## Deployed App Link by Vercel
+Go to: ([https://financial-data-oq3r0abnp-adam-sadovs-projects.vercel.app](https://site.financialmodelingprep.com))
+
 
 ## Directory Structure
 ### /.
